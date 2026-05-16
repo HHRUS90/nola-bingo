@@ -117,7 +117,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            z-index: 2; /* Sits over background icons and Ray stamps to ensure readability */
+            z-index: 2;
         }
 
         /* Special High-Contrast Styling for center text variant */
@@ -133,20 +133,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Fills entire space perfectly without distortion or stretching */
+            object-fit: contain;
             opacity: 0;
-            transform: scale(1.3); /* Pop animation starting state (removed rotation) */
+            transform: scale(1.3);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             filter: drop-shadow(0 0 6px rgba(214, 175, 55, 0.8));
-            z-index: 1; /* Under the text banner but entirely covering the challenge icon */
-            padding-bottom: 22px; /* Mirrors layout padding so faces align beautifully with icons */
+            z-index: 1;
+            padding-bottom: 22px;
         }
 
         /* Active Animated State for the Ray Stamp */
         .bingo-square.checked .ray-stamp {
             opacity: 1;
-            transform: scale(1); /* Snaps squarely into place without tilt */
+            transform: scale(1);
         }
 
         .bingo-square.checked {
@@ -154,7 +154,7 @@
         }
         
         .bingo-square.checked .square-img {
-            opacity: 0.2; /* Extra dim on original icon so full-size Ray photo shines */
+            opacity: 0.2;
         }
 
         /* Win Notification */
@@ -256,8 +256,8 @@
     </div>
 
     <script>
-        // 25 Locked Tasks Layout (5x5)
-        const tasks = [
+        // Baseline Raw List of 25 Tasks
+        const rawTasks = [
             { text: "Eat a Muffaletta Sandwich", img: "muffaletta.png" },
             { text: "Place a Wager at Harrah's", img: "wager.png" },
             { text: "Drink a Hurricane (Pat O'Brien's)", img: "hurricane.png" },
@@ -272,7 +272,7 @@
 
             { text: "Drink a Monsoon (Port of Call)", img: "monsoon.png" },
             { text: "Take a Fanboat Tour", img: "fanboat.png" },
-            { text: "🔥 RAY'S CHOICE 🔥", img: "ray13.png" }, // Index 12
+            { text: "🔥 RAY'S CHOICE 🔥", img: "ray13.png" }, // Target Center Item
             { text: "Eat some Bananas Foster", img: "bananas.png" },
             { text: "Drink a Purple Drank (Lafitte's Blacksmith)", img: "purple.png" },
 
@@ -288,6 +288,21 @@
             { text: "Drink at the Carosel Bar", img: "carosel.png" },
             { text: "Eat some Etouffee", img: "etoufee.png" }
         ];
+
+        // --- Board Randomization Processing ---
+        // 1. Separate the Center Choice item from the list
+        const centerItem = rawTasks.find(t => t.text === "🔥 RAY'S CHOICE 🔥");
+        const poolToShuffle = rawTasks.filter(t => t.text !== "🔥 RAY'S CHOICE 🔥");
+
+        // 2. Shuffle the remaining 24 items using Fisher-Yates algorithm
+        for (let i = poolToShuffle.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [poolToShuffle[i], poolToShuffle[j]] = [poolToShuffle[j], poolToShuffle[i]];
+        }
+
+        // 3. Force the Center Choice item explicitly back into index position 12
+        poolToShuffle.splice(12, 0, centerItem);
+        const tasks = poolToShuffle; // Reassigned layout setup array
 
         const board = document.getElementById('board');
         const winMessage = document.getElementById('win-message');
