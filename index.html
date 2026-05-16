@@ -117,7 +117,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            z-index: 1; /* Sits below the check stamp but above the challenge background image */
+            z-index: 2; /* Sits over background icons and Ray stamps to ensure readability */
         }
 
         /* Special High-Contrast Styling for center text variant */
@@ -126,24 +126,27 @@
             font-weight: 900;
         }
 
-        /* Animated Ray Stamp Overlay Replacement */
+        /* Animated Full-Square Ray Stamp Overlay */
         .ray-stamp {
             position: absolute;
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Fills entire space perfectly without distortion or stretching */
             opacity: 0;
-            transform: scale(1.3) rotate(-10deg);
+            transform: scale(1.3); /* Pop animation starting state (removed rotation) */
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             filter: drop-shadow(0 0 6px rgba(214, 175, 55, 0.8));
-            z-index: 2; /* Stamps over everything */
+            z-index: 1; /* Under the text banner but entirely covering the challenge icon */
+            padding-bottom: 22px; /* Mirrors layout padding so faces align beautifully with icons */
         }
 
         /* Active Animated State for the Ray Stamp */
         .bingo-square.checked .ray-stamp {
             opacity: 1;
-            transform: scale(1) rotate(-5deg);
+            transform: scale(1); /* Snaps squarely into place without tilt */
         }
 
         .bingo-square.checked {
@@ -151,7 +154,7 @@
         }
         
         .bingo-square.checked .square-img {
-            opacity: 0.3; /* Dims the challenge icon slightly so Ray's face pops */
+            opacity: 0.2; /* Extra dim on original icon so full-size Ray photo shines */
         }
 
         /* Win Notification */
@@ -249,7 +252,6 @@
             <li>Challenge 3: Wear a costume all day</li>
             <li>Challenge 4: Get a stranger to tell you a story or a joke</li>
             <li>Challenge 5: Get a stranger to buy you a drink</li>
-            <li>Challenge 6: Stay out past 10pm every night!</li>
         </ul>
     </div>
 
@@ -309,7 +311,7 @@
             imgEl.classList.add('square-img');
             square.appendChild(imgEl);
 
-            // 2. Create the hidden Ray Stamp element
+            // 2. Create the hidden Full-Square Ray Stamp element
             const rayImg = document.createElement('img');
             rayImg.classList.add('ray-stamp');
             square.appendChild(rayImg);
