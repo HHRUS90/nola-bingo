@@ -204,12 +204,33 @@
             color: #e0e0e0;
             display: flex;
             align-items: flex-start;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s ease, opacity 0.2s ease;
         }
 
         .challenges-list li::before {
             content: "⚜️";
             margin-right: 10px;
             font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        /* Strike-through completed state for challenges */
+        .challenges-list li.completed {
+            text-decoration: line-through;
+            color: #777777;
+            opacity: 0.6;
+        }
+
+        /* Footer Credits Note */
+        footer {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 0.75rem;
+            color: #555555;
+            text-align: center;
+            letter-spacing: 1px;
         }
 
         @keyframes blink {
@@ -236,7 +257,7 @@
 
     <header>
         <h1>NOLA Scavenger Hunt BINGO</h1>
-        <p>🎭 Rays's Bachelor Party 🎭</p>
+        <p>🎭 Ray's Bachelor Party 🎭</p>
     </header>
 
     <div class="bingo-board" id="board"></div>
@@ -246,7 +267,7 @@
     <!-- Locked Challenges Container Below Board -->
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
-        <ul class="challenges-list">
+        <ul class="challenges-list" id="challenges-ul">
             <li>Challenge 1: Make a Toast to Ray at a Packed Bar</li>
             <li>Challenge 2: Get a stranger to give you a high five without prompting or saying anything</li>
             <li>Challenge 3: Wear a costume all day</li>
@@ -255,6 +276,8 @@
             <li>Challenge 6: Stay out past 10pm every night</li>
         </ul>
     </div>
+
+    <footer>Created by AJ Sundby 5/28/2026</footer>
 
     <script>
         // Baseline Raw List of 25 Tasks
@@ -303,7 +326,7 @@
 
         // 3. Force the Center Choice item explicitly back into index position 12
         poolToShuffle.splice(12, 0, centerItem);
-        const tasks = poolToShuffle; // Reassigned layout setup array
+        const tasks = poolToShuffle; 
 
         const board = document.getElementById('board');
         const winMessage = document.getElementById('win-message');
@@ -360,6 +383,14 @@
             });
 
             board.appendChild(square);
+        });
+
+        // Toggle strike-through completed state for Challenges
+        const challengeItems = document.querySelectorAll('#challenges-ul li');
+        challengeItems.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('completed');
+            });
         });
 
         // Winning combinations logic
