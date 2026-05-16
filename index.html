@@ -78,9 +78,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between; /* Pushes image to top, text to bottom */
             text-align: center;
-            padding: 4px;
+            padding: 6px 3px; /* Slightly tighter horizontal padding for text */
             cursor: pointer;
             position: relative;
             user-select: none;
@@ -92,24 +92,25 @@
             transform: scale(0.95);
         }
 
-        /* Style for the images inside the bingo squares */
+        /* Maximized Image Styling */
         .square-img {
-            width: 45%;
-            max-height: 35px;
-            object-fit: contain;
-            margin-bottom: 4px;
+            width: 90%;             /* Uses almost the entire width of the square */
+            height: 60%;            /* Allocates the majority of vertical space to the image */
+            object-fit: contain;    /* Scale up as much as possible without stretching or cropping */
             pointer-events: none;
+            margin-bottom: 2px;
         }
 
-        /* Text styling inside squares */
+        /* Adjusted Text Container */
         .square-text {
-            font-size: 0.52rem;
+            font-size: 0.48rem;     /* Tiny but legible on mobile to prevent layout blowouts */
             font-weight: bold;
             line-height: 1.1;
             color: #f0f0f0;
             word-wrap: break-word;
+            width: 100%;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 3;  /* Strict limit to keep things uniform */
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -127,8 +128,8 @@
         .bingo-square::after {
             content: '';
             position: absolute;
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             border: 4px solid #ff3333;
             border-radius: 50%;
             opacity: 0;
@@ -211,11 +212,10 @@
         /* Desktop sizing adjustments */
         @media(min-width: 500px) {
             .square-img {
-                max-height: 55px;
+                height: 65%;
             }
             .square-text {
-                font-size: 0.7rem;
-                -webkit-line-clamp: 4;
+                font-size: 0.68rem;
             }
             .challenges-list li {
                 font-size: 0.95rem;
@@ -259,7 +259,7 @@
             { text: "Drink a Sazerac", img: "sazerac.png" },
             { text: "Get a photo with a Mardi Gras float piece", img: "float.png" },
 
-            { text: "Drink a Monson (Port of Call)", img: "courtyard.png" },
+            { text: "Drink a Monsoon (Port of Call)", img: "courtyard.png" },
             { text: "Take a Fanboat Tour", img: "psychic.png" },
             { text: "🔥 RAY'S CHOICE 🔥", img: "bachelor-drink.png" }, // Index 12
             { text: "Eat some Bananas Foster", img: "streetcar.png" },
@@ -267,7 +267,7 @@
 
             { text: "Eat a cup of Gumbo or Turtle Soup", img: "preservation.png" },
             { text: "Watch live music on Bourbon Street", img: "painting.png" },
-            { text: "Have an Irish Coffee (Erin Rose)", img: "sazerac.png" },
+            { text: "Have an Irish Coffee (Erin Rose)", img: "coffee.png" },
             { text: "Have a drink in The Dungeon ", img: "balcony.png" },
             { text: "Get beads thrown at you", img: "ridiculous.png" },
 
@@ -275,7 +275,7 @@
             { text: "Drink a Grenade or Daquiri", img: "magic.png" },
             { text: "Indulge in a Charbroiled Oyster", img: "jackson.png" },
             { text: "Buy an incredibly tacky souvenir", img: "souvenir.png" },
-            { text: "Eat some Etoufee", img: "toast.png" }
+            { text: "Eat some Etouffee", img: "toast.png" }
         ];
 
         const board = document.getElementById('board');
