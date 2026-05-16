@@ -231,6 +231,14 @@
             color: #555555;
             text-align: center;
             letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        footer .love-ray {
+            color: var(--nola-gold);
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 8px;
         }
 
         /* 25-Square Blackout Victory Full Screen Modal */
@@ -306,12 +314,12 @@
 
     <header>
         <h1>NOLA Scavenger Hunt BINGO</h1>
-        <p>🎭 Ray's Bachelor Party 🎭</p>
+        <p>🎭 Ray's Bachelor Party in the Big Easy 🎭</p>
     </header>
 
     <div class="bingo-board" id="board"></div>
 
-    <div id="win-message">🎉 BINGO!!! 🎉</div>
+    <div id="win-message">🎉 RAY-BINGO!!! 🎉</div>
 
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
@@ -325,7 +333,7 @@
         </ul>
     </div>
 
-    <footer>Created by AJ Sundby 5/28/2026</footer>
+    <footer>Created by AJ Sundby 5/28/2026 <span class="love-ray">Love you Ray!</span></footer>
 
     <div id="blackout-modal">
         <div class="modal-content-wrapper">
@@ -391,7 +399,7 @@
 
         // Preload Victory Audio Element
         const victoryMusic = new Audio('bigeasy.mp3');
-        victoryMusic.loop = true; // Loops the music track while on the win screen
+        victoryMusic.loop = true; 
 
         // Generate the board HTML dynamically
         tasks.forEach((taskObj, index) => {
@@ -432,9 +440,8 @@
                 // Track Blackout Win vs Standard Row/Column Win
                 if (state.every(squareChecked => squareChecked === true)) {
                     blackoutModal.style.display = 'flex';
-                    // Concurrently trigger bigeasy.mp3 background audio playback
                     victoryMusic.play().catch(err => {
-                        console.log("Audio autoplay prevented by browser policy. Interaction required.", err);
+                        console.log("Audio autoplay prevented by browser policy.", err);
                     });
                 } else if (checkBingo()) {
                     winMessage.style.display = 'block';
