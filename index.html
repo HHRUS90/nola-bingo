@@ -242,7 +242,7 @@
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.95);
             z-index: 9999;
-            display: none; /* Controlled via JS */
+            display: none;
             align-items: center;
             justify-content: center;
         }
@@ -263,14 +263,23 @@
             object-fit: contain;
         }
 
-        /* Invisible interactive overlay area for the PLAY AGAIN action */
+        /* Invisible interactive hotspot areas overlaying image buttons */
         .play-again-hotspot {
             position: absolute;
-            bottom: 12%; /* Aligns over the baked graphic area */
+            bottom: 12.5%; 
             width: 38%;
-            height: 7%;
+            height: 6.5%;
             cursor: pointer;
-            background-color: rgba(255, 255, 255, 0); /* Invisible link container */
+            background-color: rgba(255, 255, 255, 0); 
+        }
+
+        .share-win-hotspot {
+            position: absolute;
+            bottom: 4.5%; 
+            width: 38%;
+            height: 6.5%;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0);
         }
 
         @keyframes blink {
@@ -302,7 +311,7 @@
 
     <div class="bingo-board" id="board"></div>
 
-    <div id="win-message">🎉 RAY-BINGO!!! 🎉</div>
+    <div id="win-message">🎉 BINGO!!! 🎉</div>
 
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
@@ -322,6 +331,7 @@
         <div class="modal-content-wrapper">
             <img src="raycongratsplayagain.png" alt="Congratulations!" class="victory-img">
             <div class="play-again-hotspot" id="btn-play-again"></div>
+            <div class="share-win-hotspot" id="btn-share-win"></div>
         </div>
     </div>
 
@@ -360,17 +370,14 @@
         ];
 
         // --- Board Randomization Processing ---
-        // 1. Separate the Center Choice item from the list
         const centerItem = rawTasks.find(t => t.text === "🔥 RAY'S CHOICE 🔥");
         const poolToShuffle = rawTasks.filter(t => t.text !== "🔥 RAY'S CHOICE 🔥");
 
-        // 2. Shuffle the remaining 24 items using Fisher-Yates algorithm
         for (let i = poolToShuffle.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [poolToShuffle[i], poolToShuffle[j]] = [poolToShuffle[j], poolToShuffle[i]];
         }
 
-        // 3. Force the Center Choice item explicitly back into index position 12
         poolToShuffle.splice(12, 0, centerItem);
         const tasks = poolToShuffle; 
 
@@ -378,8 +385,8 @@
         const winMessage = document.getElementById('win-message');
         const blackoutModal = document.getElementById('blackout-modal');
         const btnPlayAgain = document.getElementById('btn-play-again');
+        const btnShareWin = document.getElementById('btn-share-win');
         
-        // Track checked state for the 25 squares
         const state = Array(25).fill(false);
 
         // Generate the board HTML dynamically
@@ -391,19 +398,16 @@
                 square.classList.add('center-choice');
             }
 
-            // 1. Create and add the baseline challenge icon
             const imgEl = document.createElement('img');
             imgEl.src = taskObj.img;
             imgEl.alt = taskObj.text;
             imgEl.classList.add('square-img');
             square.appendChild(imgEl);
 
-            // 2. Create the hidden Full-Square Ray Stamp element
             const rayImg = document.createElement('img');
             rayImg.classList.add('ray-stamp');
             square.appendChild(rayImg);
 
-            // 3. Create and add the text element (Absolute Overlay Banner)
             const textSpan = document.createElement('span');
             textSpan.classList.add('square-text');
             textSpan.innerText = taskObj.text;
@@ -421,9 +425,8 @@
                     square.classList.remove('checked');
                 }
                 
-                // Evaluate win conditions (Standard Bingo lines vs Full 25-Square Blackout)
+                // Track Blackout Win vs Standard Row/Column Win
                 if (state.every(squareChecked => squareChecked === true)) {
-                    // All 25 spaces checked: instantly trigger the custom full screen modal
                     blackoutModal.style.display = 'flex';
                 } else if (checkBingo()) {
                     winMessage.style.display = 'block';
@@ -443,9 +446,34 @@
             });
         });
 
-        // Play Again functionality reloads page to clear/reshuffle fresh board
+        // Play Again reloads page to reset states and clear layout 
         btnPlayAgain.addEventListener('click', () => {
             window.location.reload();
+        });
+
+        // Share Win implementation utilizing native device triggers
+        btnShareWin.addEventListener('click', async () => {
+            const shareData = {
+                title: "NOLA Bachelor BINGO Victory!",
+                text: "I just completed the entire NOLA Bachelor BINGO Challenge for Ray's Bachelor Party! 🎭🎉",
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log("Share dismissed or canceled:", err);
+                }
+            } else {
+                // Fallback action for older browsers/devices missing share API
+                try {
+                    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                    alert("Victory announcement copied to clipboard! Paste it to share with the group chat.");
+                } catch (err) {
+                    alert("Could not copy link automatically. Screenshot your screen to share the win!");
+                }
+            }
         });
 
         // Winning combinations logic
