@@ -306,12 +306,12 @@
 
     <header>
         <h1>NOLA Scavenger Hunt BINGO</h1>
-        <p>🎭 Ray's Bachelor Party in the Big Easy! 🎭</p>
+        <p>🎭 Ray's Bachelor Party 🎭</p>
     </header>
 
     <div class="bingo-board" id="board"></div>
 
-    <div id="win-message">🎉 RAY-BINGO!!! 🎉</div>
+    <div id="win-message">🎉 BINGO!!! 🎉</div>
 
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
@@ -325,8 +325,7 @@
         </ul>
     </div>
 
-    <footer>Created by AJ Sundby 5/16/2026</footer>
-    <footer>Love you Ray!</footer>
+    <footer>Created by AJ Sundby 5/28/2026</footer>
 
     <div id="blackout-modal">
         <div class="modal-content-wrapper">
@@ -390,6 +389,10 @@
         
         const state = Array(25).fill(false);
 
+        // Preload Victory Audio Element
+        const victoryMusic = new Audio('bigeasy.mp3');
+        victoryMusic.loop = true; // Loops the music track while on the win screen
+
         // Generate the board HTML dynamically
         tasks.forEach((taskObj, index) => {
             const square = document.createElement('div');
@@ -429,6 +432,10 @@
                 // Track Blackout Win vs Standard Row/Column Win
                 if (state.every(squareChecked => squareChecked === true)) {
                     blackoutModal.style.display = 'flex';
+                    // Concurrently trigger bigeasy.mp3 background audio playback
+                    victoryMusic.play().catch(err => {
+                        console.log("Audio autoplay prevented by browser policy. Interaction required.", err);
+                    });
                 } else if (checkBingo()) {
                     winMessage.style.display = 'block';
                 } else {
@@ -449,6 +456,8 @@
 
         // Play Again reloads page to reset states and clear layout 
         btnPlayAgain.addEventListener('click', () => {
+            victoryMusic.pause();
+            victoryMusic.currentTime = 0;
             window.location.reload();
         });
 
@@ -467,7 +476,6 @@
                     console.log("Share dismissed or canceled:", err);
                 }
             } else {
-                // Fallback action for older browsers/devices missing share API
                 try {
                     await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
                     alert("Victory announcement copied to clipboard! Paste it to share with the group chat.");
