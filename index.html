@@ -57,7 +57,7 @@
             font-weight: 600;
         }
 
-        /* 5x5 Bingo Grid - Removed aspect-ratio to allow rectangular scaling */
+        /* 5x5 Bingo Grid */
         .bingo-board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -83,7 +83,7 @@
             user-select: none;
             transition: transform 0.1s ease, background-color 0.2s ease;
             overflow: hidden;
-            min-height: 110px; /* Ensures a clean rectangular shape on all mobile widths */
+            min-height: 110px;
         }
 
         .bingo-square:active {
@@ -94,9 +94,9 @@
         .square-img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Maximum fit size without stretching or distorting */
+            object-fit: contain;
             pointer-events: none;
-            padding-bottom: 22px; /* Leaves clear breathing room for the bottom text overlay */
+            padding-bottom: 22px;
         }
 
         /* Text Overlay Bottom Banner */
@@ -117,6 +117,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            z-index: 1; /* Sits below the check stamp but above the challenge background image */
         }
 
         /* Special High-Contrast Styling for center text variant */
@@ -125,34 +126,32 @@
             font-weight: 900;
         }
 
-        /* The "Clicked/Checked" Neon Circle Overlay */
-        .bingo-square::after {
-            content: '';
+        /* Animated Ray Stamp Overlay Replacement */
+        .ray-stamp {
             position: absolute;
-            width: 85%;
-            height: 85%;
-            border: 4px solid #ff3333;
-            border-radius: 50%;
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
             opacity: 0;
             transform: scale(1.3) rotate(-10deg);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
-            box-shadow: 0 0 8px #ff3333, inset 0 0 8px #ff3333;
-            z-index: 2;
+            filter: drop-shadow(0 0 6px rgba(214, 175, 55, 0.8));
+            z-index: 2; /* Stamps over everything */
         }
 
-        /* Active State for Circle */
-        .bingo-square.checked::after {
-            opacity: 0.85;
+        /* Active Animated State for the Ray Stamp */
+        .bingo-square.checked .ray-stamp {
+            opacity: 1;
             transform: scale(1) rotate(-5deg);
         }
 
         .bingo-square.checked {
-            background-color: #1a1111;
+            background-color: #1a1511;
         }
         
         .bingo-square.checked .square-img {
-            opacity: 0.4;
+            opacity: 0.3; /* Dims the challenge icon slightly so Ray's face pops */
         }
 
         /* Win Notification */
@@ -241,7 +240,7 @@
 
     <div id="win-message">🎉 BINGO!!! 🎉</div>
 
-    <!-- Challenges Container Below Board -->
+    <!-- Locked Challenges Container Below Board -->
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
         <ul class="challenges-list">
@@ -290,8 +289,7 @@
         const board = document.getElementById('board');
         const winMessage = document.getElementById('win-message');
         
-        // Track the state of the 25 squares (false = unchecked, true = checked)
-        // Center space (index 12) now starts as false (unchecked) per request
+        // Track checked state for the 25 squares
         const state = Array(25).fill(false);
 
         // Generate the board HTML dynamically
@@ -303,14 +301,19 @@
                 square.classList.add('center-choice');
             }
 
-            // 1. Create and add the image element
+            // 1. Create and add the baseline challenge icon
             const imgEl = document.createElement('img');
             imgEl.src = taskObj.img;
             imgEl.alt = taskObj.text;
             imgEl.classList.add('square-img');
             square.appendChild(imgEl);
 
-            // 2. Create and add the text element (Absolute Overlay Banner)
+            // 2. Create the hidden Ray Stamp element
+            const rayImg = document.createElement('img');
+            rayImg.classList.add('ray-stamp');
+            square.appendChild(rayImg);
+
+            // 3. Create and add the text element (Absolute Overlay Banner)
             const textSpan = document.createElement('span');
             textSpan.classList.add('square-text');
             textSpan.innerText = taskObj.text;
@@ -319,8 +322,17 @@
             // Click Handler
             square.addEventListener('click', () => {
                 state[index] = !state[index];
-                square.classList.toggle('checked');
                 
+                if (state[index]) {
+                    // Selecting a fresh random file variant (ray1.png to ray10.png) upon tap
+                    const randomNum = Math.floor(Math.random() * 10) + 1;
+                    rayImg.src = `ray${randomNum}.png`;
+                    square.classList.add('checked');
+                } else {
+                    square.classList.remove('checked');
+                }
+                
+                // Evaluate win conditions
                 if (checkBingo()) {
                     winMessage.style.display = 'block';
                 } else {
