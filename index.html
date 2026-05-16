@@ -76,13 +76,10 @@
             border: 1px solid #333;
             border-radius: 4px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Pushes image to top, text to bottom */
-            text-align: center;
-            padding: 6px 3px; /* Slightly tighter horizontal padding for text */
+            justify-content: center;
             cursor: pointer;
-            position: relative;
+            position: relative; /* Serves as anchor for absolute overlay text */
             user-select: none;
             transition: transform 0.1s ease, background-color 0.2s ease;
             overflow: hidden;
@@ -92,25 +89,31 @@
             transform: scale(0.95);
         }
 
-        /* Maximized Image Styling */
+        /* Full Size Image Layout */
         .square-img {
-            width: 90%;             /* Uses almost the entire width of the square */
-            height: 60%;            /* Allocates the majority of vertical space to the image */
-            object-fit: contain;    /* Scale up as much as possible without stretching or cropping */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Maximum fit size without stretching or distorting */
             pointer-events: none;
-            margin-bottom: 2px;
         }
 
-        /* Adjusted Text Container */
+        /* Text Overlay Bottom Banner */
         .square-text {
-            font-size: 0.48rem;     /* Tiny but legible on mobile to prevent layout blowouts */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            /* Dark gradient background ensures text pops over any bright images */
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 70%, rgba(0,0,0,0.4) 100%);
+            padding: 4px 2px;
+            font-size: 0.5rem;
             font-weight: bold;
             line-height: 1.1;
-            color: #f0f0f0;
+            color: #ffffff;
+            text-align: center;
             word-wrap: break-word;
-            width: 100%;
             display: -webkit-box;
-            -webkit-line-clamp: 3;  /* Strict limit to keep things uniform */
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -120,7 +123,8 @@
             background: linear-gradient(135deg, #5c4308, var(--nola-gold));
         }
         .bingo-square.free-space .square-text {
-            color: #000;
+            color: var(--nola-gold);
+            background: rgba(0, 0, 0, 0.85);
             font-weight: 900;
         }
 
@@ -137,6 +141,7 @@
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             box-shadow: 0 0 8px #ff3333, inset 0 0 8px #ff3333;
+            z-index: 2; /* Ensures marker draws completely over image and text banner */
         }
 
         /* Active State for Circle */
@@ -145,8 +150,13 @@
             transform: scale(1) rotate(-5deg);
         }
 
+        /* Dim card background slightly when selected */
         .bingo-square.checked {
             background-color: #1a1111;
+        }
+        
+        .bingo-square.checked .square-img {
+            opacity: 0.4; /* Slightly dims image under red circle to emphasize checkmark */
         }
 
         /* Win Notification */
@@ -211,11 +221,9 @@
 
         /* Desktop sizing adjustments */
         @media(min-width: 500px) {
-            .square-img {
-                height: 65%;
-            }
             .square-text {
-                font-size: 0.68rem;
+                font-size: 0.65rem;
+                padding: 6px 4px;
             }
             .challenges-list li {
                 font-size: 0.95rem;
@@ -255,19 +263,19 @@
 
             { text: "Sample Beignets at Café Du Monde", img: "beignet.png" },
             { text: "Eat a Beignet", img: "brass.png" },
-            { text: "Throw beads from a Bourbon Street Rooftop", img: "boobs.png" },
-            { text: "Drink a Sazerac", img: "sazerac.png" },
+            { text: "Throw beads from a Bourbon Street Rooftop", img: "phrase.png" },
+            { text: "Drink a Sazerac", img: "secondline.png" },
             { text: "Get a photo with a Mardi Gras float piece", img: "float.png" },
 
             { text: "Drink a Monsoon (Port of Call)", img: "courtyard.png" },
             { text: "Take a Fanboat Tour", img: "psychic.png" },
             { text: "🔥 RAY'S CHOICE 🔥", img: "bachelor-drink.png" }, // Index 12
             { text: "Eat some Bananas Foster", img: "streetcar.png" },
-            { text: "Drink a Purple Drank (Lafitte's Blacksmith)", img: "purple.png" },
+            { text: "Drink a Purple Drank (Lafitte's Blacksmith)", img: "artist.png" },
 
             { text: "Eat a cup of Gumbo or Turtle Soup", img: "preservation.png" },
             { text: "Watch live music on Bourbon Street", img: "painting.png" },
-            { text: "Have an Irish Coffee (Erin Rose)", img: "coffee.png" },
+            { text: "Have an Irish Coffee (Erin Rose)", img: "sazerac.png" },
             { text: "Have a drink in The Dungeon ", img: "balcony.png" },
             { text: "Get beads thrown at you", img: "ridiculous.png" },
 
@@ -300,7 +308,7 @@
             imgEl.classList.add('square-img');
             square.appendChild(imgEl);
 
-            // 2. Create and add the text element
+            // 2. Create and add the text element (Absolute Overlay Banner)
             const textSpan = document.createElement('span');
             textSpan.classList.add('square-text');
             textSpan.innerText = taskObj.text;
