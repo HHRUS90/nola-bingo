@@ -64,7 +64,7 @@
             gap: 6px;
             width: 100%;
             max-width: 500px;
-            aspect-ratio: 1 / 1; /* Keeps it perfectly square */
+            aspect-ratio: 1 / 1;
             background-color: var(--nola-gold);
             padding: 6px;
             border-radius: 8px;
@@ -98,7 +98,7 @@
             max-height: 35px;
             object-fit: contain;
             margin-bottom: 4px;
-            pointer-events: none; /* Prevents image dragging/ghosting on mobile touch */
+            pointer-events: none;
         }
 
         /* Text styling inside squares */
@@ -134,7 +134,7 @@
             opacity: 0;
             transform: scale(1.3) rotate(-10deg);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; /* Allows clicking through the circle to uncheck */
+            pointer-events: none;
             box-shadow: 0 0 8px #ff3333, inset 0 0 8px #ff3333;
         }
 
@@ -144,7 +144,6 @@
             transform: scale(1) rotate(-5deg);
         }
 
-        /* Dim the background slightly when checked to make circle pop */
         .bingo-square.checked {
             background-color: #1a1111;
         }
@@ -161,6 +160,49 @@
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
+        /* Challenges List Styling */
+        .challenges-container {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--nola-purple);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .challenges-container h2 {
+            color: var(--nola-gold);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .challenges-list {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .challenges-list li {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .challenges-list li::before {
+            content: "⚜️";
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+
         @keyframes blink {
             from { opacity: 0.4; }
             to { opacity: 1; }
@@ -174,6 +216,9 @@
             .square-text {
                 font-size: 0.7rem;
                 -webkit-line-clamp: 4;
+            }
+            .challenges-list li {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -189,46 +234,53 @@
 
     <div id="win-message">🎉 BINGO!!! 🎉</div>
 
+    <!-- Challenges Container Below Board -->
+    <div class="challenges-container">
+        <h2>🔥 Weekend Challenges 🔥</h2>
+        <ul class="challenges-list">
+            <li>Placeholder Challenge 1: Elaborate on your rules or custom group feats here.</li>
+            <li>Placeholder Challenge 2: Add extra rules that don't fit into the main grid squares.</li>
+            <li>Placeholder Challenge 3: Track overall high scores or penalties for the crew.</li>
+        </ul>
+    </div>
+
     <script>
-        // 25 Tasks layout (5x5). 
-        // Swap out the text and local file names/URLs below as you please!
+        // 25 Current Tasks Layout (5x5)
         const tasks = [
-            { text: "Get a bead from a total stranger", img: "beads.png" },
+            { text: "Eat a Muffaletta Sandwich", img: "beads.png" },
             { text: "Spot someone in a Saints jersey", img: "saints.png" },
-            { text: "Drink a Hurricane at Pat O'Brien's", img: "hurricane.png" },
-            { text: "Take a photo with a street performer", img: "performer.png" },
-            { text: "Visit a Voodoo shop", img: "voodoo.png" },
+            { text: "Drink a Hurricane (Pat O'Brien's)", img: "hurricane.png" },
+            { text: "Have a blood drink at the Vampire Cafe", img: "performer.png" },
+            { text: "Eat a Po'Boy", img: "voodoo.png" },
 
             { text: "Sample Beignets at Café Du Monde", img: "beignet.png" },
-            { text: "Find a bar with live Brass music", img: "brass.png" },
-            { text: "Learn a local phrase from a local", img: "phrase.png" },
-            { text: "Dance along with a Second Line", img: "secondline.png" },
+            { text: "Eat a Beignet", img: "brass.png" },
+            { text: "Throw beads from a Bourbon Street Rooftop", img: "phrase.png" },
+            { text: "Drink a Sazerac", img: "secondline.png" },
             { text: "Get a photo with a Mardi Gras float piece", img: "float.png" },
 
-            { text: "Find a hidden courtyard bar", img: "courtyard.png" },
-            { text: "See a psychic or fortune teller", img: "psychic.png" },
+            { text: "Drink a Monson (Port of Call)", img: "courtyard.png" },
+            { text: "Take a Fanboat Tour", img: "psychic.png" },
             { text: "🔥 RAY'S CHOICE 🔥", img: "bachelor-drink.png" }, // Index 12
-            { text: "Ride the St. Charles Streetcar", img: "streetcar.png" },
-            { text: "Meet a local artist in the French Quarter", img: "artist.png" },
+            { text: "Eat some Bananas Foster", img: "streetcar.png" },
+            { text: "Drink a Purple Drank (Lafitte's Blacksmith)", img: "artist.png" },
 
-            { text: "Visit Preservation Hall", img: "preservation.png" },
-            { text: "Spot a live street painting session", img: "painting.png" },
-            { text: "Order a classic Sazerac cocktail", img: "sazerac.png" },
-            { text: "Spot a classic NOLA balcony", img: "balcony.png" },
-            { text: "Get the bachelor to wear something ridiculous", img: "ridiculous.png" },
+            { text: "Eat a cup of Gumbo or Turtle Soup", img: "preservation.png" },
+            { text: "Watch live music on Bourbon Street", img: "painting.png" },
+            { text: "Have an Irish Coffee (Erin Rose)", img: "sazerac.png" },
+            { text: "Have a drink in The Dungeon ", img: "balcony.png" },
+            { text: "Get beads thrown at you", img: "ridiculous.png" },
 
-            { text: "Do a dance on Bourbon Street", img: "dance.png" },
-            { text: "Watch a street magic trick", img: "magic.png" },
-            { text: "Take a group photo at Jackson Square", img: "jackson.png" },
+            { text: "Watch Live Music on Frenchman Street", img: "dance.png" },
+            { text: "Drink a Grenade or Daquiri", img: "magic.png" },
+            { text: "Indulge in a Charbroiled Oyster", img: "jackson.png" },
             { text: "Buy an incredibly tacky souvenir", img: "souvenir.png" },
-            { text: "Make a loud toast to the bachelor at a packed bar", img: "toast.png" }
+            { text: "Eat some Etoufee", img: "toast.png" }
         ];
 
         const board = document.getElementById('board');
         const winMessage = document.getElementById('win-message');
         
-        // Track the state of the 25 squares (false = unchecked, true = checked)
-        // Free space (index 12) starts as true
         const state = Array(25).fill(false);
         state[12] = true; 
 
@@ -256,7 +308,7 @@
 
             // Click Handler
             square.addEventListener('click', () => {
-                if (index === 12) return; // Free space stays checked
+                if (index === 12) return; 
 
                 state[index] = !state[index];
                 square.classList.toggle('checked');
