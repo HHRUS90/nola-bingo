@@ -61,12 +61,12 @@
         .bingo-board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             max-width: 500px;
             aspect-ratio: 1 / 1; /* Keeps it perfectly square */
             background-color: var(--nola-gold);
-            padding: 8px;
+            padding: 6px;
             border-radius: 8px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.7);
         }
@@ -92,15 +92,24 @@
             transform: scale(0.95);
         }
 
+        /* Style for the images inside the bingo squares */
+        .square-img {
+            width: 45%;
+            max-height: 35px;
+            object-fit: contain;
+            margin-bottom: 4px;
+            pointer-events: none; /* Prevents image dragging/ghosting on mobile touch */
+        }
+
         /* Text styling inside squares */
         .square-text {
-            font-size: 0.65rem;
+            font-size: 0.52rem;
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.1;
             color: #f0f0f0;
             word-wrap: break-word;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -157,10 +166,14 @@
             to { opacity: 1; }
         }
 
-        /* Desktop sizing adjustment */
+        /* Desktop sizing adjustments */
         @media(min-width: 500px) {
+            .square-img {
+                max-height: 55px;
+            }
             .square-text {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
+                -webkit-line-clamp: 4;
             }
         }
     </style>
@@ -177,13 +190,38 @@
     <div id="win-message">🎉 BINGO!!! 🎉</div>
 
     <script>
-        // 25 Tasks array (5x5 layout)
+        // 25 Tasks layout (5x5). 
+        // Swap out the text and local file names/URLs below as you please!
         const tasks = [
-            "Get a bead from a total stranger", "Spot someone in a Saints jersey", "Drink a Hurricane at Pat O'Brien's", "Take a photo with a street performer", "Visit a Voodoo shop",
-            "Sample Beignets at Café Du Monde", "Find a bar with live Brass music", "Learn a local phrase from a local", "Dance along with a Second Line", "Get a photo with a Mardi Gras float piece",
-            "Find a hidden courtyard bar", "See a psychic or fortune teller", "🔥 FREE SPACE: DRINK! 🔥", "Ride the St. Charles Streetcar", "Meet a local artist in the French Quarter",
-            "Visit Preservation Hall", "Spot a live street painting session", "Order a classic Sazerac cocktail", "Spot a classic NOLA balcony", "Get the bachelor to wear something ridiculous",
-            "Do a dance on Bourbon Street", "Watch a street magic trick", "Take a group photo at Jackson Square", "Buy a incredibly tacky souvenir", "Make a loud toast to the bachelor at a packed bar"
+            { text: "Get a bead from a total stranger", img: "beads.png" },
+            { text: "Spot someone in a Saints jersey", img: "saints.png" },
+            { text: "Drink a Hurricane at Pat O'Brien's", img: "hurricane.png" },
+            { text: "Take a photo with a street performer", img: "performer.png" },
+            { text: "Visit a Voodoo shop", img: "voodoo.png" },
+
+            { text: "Sample Beignets at Café Du Monde", img: "beignet.png" },
+            { text: "Find a bar with live Brass music", img: "brass.png" },
+            { text: "Learn a local phrase from a local", img: "phrase.png" },
+            { text: "Dance along with a Second Line", img: "secondline.png" },
+            { text: "Get a photo with a Mardi Gras float piece", img: "float.png" },
+
+            { text: "Find a hidden courtyard bar", img: "courtyard.png" },
+            { text: "See a psychic or fortune teller", img: "psychic.png" },
+            { text: "🔥 RAY'S CHOICE 🔥", img: "bachelor-drink.png" }, // Index 12
+            { text: "Ride the St. Charles Streetcar", img: "streetcar.png" },
+            { text: "Meet a local artist in the French Quarter", img: "artist.png" },
+
+            { text: "Visit Preservation Hall", img: "preservation.png" },
+            { text: "Spot a live street painting session", img: "painting.png" },
+            { text: "Order a classic Sazerac cocktail", img: "sazerac.png" },
+            { text: "Spot a classic NOLA balcony", img: "balcony.png" },
+            { text: "Get the bachelor to wear something ridiculous", img: "ridiculous.png" },
+
+            { text: "Do a dance on Bourbon Street", img: "dance.png" },
+            { text: "Watch a street magic trick", img: "magic.png" },
+            { text: "Take a group photo at Jackson Square", img: "jackson.png" },
+            { text: "Buy an incredibly tacky souvenir", img: "souvenir.png" },
+            { text: "Make a loud toast to the bachelor at a packed bar", img: "toast.png" }
         ];
 
         const board = document.getElementById('board');
@@ -194,8 +232,8 @@
         const state = Array(25).fill(false);
         state[12] = true; 
 
-        // Generate the board HTML
-        tasks.forEach((task, index) => {
+        // Generate the board HTML dynamically
+        tasks.forEach((taskObj, index) => {
             const square = document.createElement('div');
             square.classList.add('bingo-square');
             
@@ -203,9 +241,17 @@
                 square.classList.add('free-space', 'checked');
             }
 
+            // 1. Create and add the image element
+            const imgEl = document.createElement('img');
+            imgEl.src = taskObj.img;
+            imgEl.alt = taskObj.text;
+            imgEl.classList.add('square-img');
+            square.appendChild(imgEl);
+
+            // 2. Create and add the text element
             const textSpan = document.createElement('span');
             textSpan.classList.add('square-text');
-            textSpan.innerText = task;
+            textSpan.innerText = taskObj.text;
             square.appendChild(textSpan);
 
             // Click Handler
