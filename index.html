@@ -17,6 +17,7 @@
             --nola-green: #007A33;
             --bg-dark: #121212;
             --card-bg: #1e1e1e;
+            --neon-purple: #9D00FF;
         }
 
         * {
@@ -87,7 +88,7 @@
             cursor: pointer;
             position: relative;
             user-select: none;
-            transition: transform 0.1s ease, background-color 0.2s ease;
+            transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
             overflow: hidden;
             min-height: 110px;
         }
@@ -155,8 +156,11 @@
             transform: scale(1);
         }
 
+        /* Checked State: Tint Background and Highlight with Thin Neon Purple Border */
         .bingo-square.checked {
             background-color: #1a1511;
+            border: 2px solid var(--neon-purple);
+            box-shadow: inset 0 0 8px rgba(157, 0, 255, 0.4);
         }
         
         .bingo-square.checked .square-img {
@@ -320,22 +324,22 @@
 
     <header>
         <h1>NOLA Scavenger Hunt BINGO</h1>
-        <p>🎭 Ray's Bachelor Party in the Big Easy 🎭</p>
+        <p>🎭 Ray's Bachelor Party 🎭</p>
     </header>
 
     <div class="bingo-board" id="board"></div>
 
-    <div id="win-message">🎉 RAY-BINGO!!! 🎉</div>
+    <div id="win-message">🎉 BINGO!!! 🎉</div>
 
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
         <ul class="challenges-list" id="challenges-ul">
-            <li>Challenge 1: Make a Toast to Ray at a Packed Bar</li>
-            <li>Challenge 2: Get a stranger to give you a high five without prompting or saying anything</li>
-            <li>Challenge 3: Wear a costume all day</li>
-            <li>Challenge 4: Get a stranger to tell you a story or a joke</li>
-            <li>Challenge 5: Get a stranger to buy you a drink</li>
-            <li>Challenge 6: Stay out past 10pm every night</li>
+            <li data-id="c1">Challenge 1: Make a Toast to Ray at a Packed Bar</li>
+            <li data-id="c2">Challenge 2: Get a stranger to give you a high five without prompting or saying anything</li>
+            <li data-id="c3">Challenge 3: Wear a costume all day</li>
+            <li data-id="c4">Challenge 4: Get a stranger to tell you a story or a joke</li>
+            <li data-id="c5">Challenge 5: Get a stranger to buy you a drink</li>
+            <li data-id="c6">Challenge 6: Stay out past 10pm every night</li>
         </ul>
     </div>
 
@@ -360,7 +364,7 @@
 
             { text: "Visit a Cemetary", img: "cemetary.png" },
             { text: "Eat a Beignet", img: "beignet.png" },
-            { text: "Throw beads from a Bourbon Street Rooftop", img: "beadthrow.png" },
+            { text: "Throw beads from a Bourbon Street Rooftop", img: "boobs.png" },
             { text: "Drink a Sazerac", img: "sazerac.png" },
             { text: "Eat some Street Meat", img: "street.png" },
 
@@ -383,25 +387,44 @@
             { text: "Eat some Etouffee", img: "etoufee.png" }
         ];
 
-        // --- Board Randomization Processing ---
-        const centerItem = rawTasks.find(t => t.text === "🔥 RAY'S CHOICE 🔥");
-        const poolToShuffle = rawTasks.filter(t => t.text !== "🔥 RAY'S CHOICE 🔥");
+        let tasks = [];
+        let state = [];
+        let stampMap = [];
 
-        for (let i = poolToShuffle.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [poolToShuffle[i], poolToShuffle[j]] = [poolToShuffle[j], poolToShuffle[i]];
+        // --- Persistent Storage Logic ---
+        const storedTasks = localStorage.getItem('nola_bingo_tasks');
+        const storedState = localStorage.getItem('nola_bingo_state');
+        const storedStamps = localStorage.getItem('nola_bingo_stamps');
+
+        if (storedTasks && storedState && storedStamps) {
+            tasks = JSON.parse(storedTasks);
+            state = JSON.parse(storedState);
+            stampMap = JSON.parse(storedStamps);
+        } else {
+            const centerItem = rawTasks.find(t => t.text === "🔥 RAY'S CHOICE 🔥");
+            const poolToShuffle = rawTasks.filter(t => t.text !== "🔥 RAY'S CHOICE 🔥");
+
+            for (let i = poolToShuffle.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [poolToShuffle[i], poolToShuffle[j]] = [poolToShuffle[j], poolToShuffle[i]];
+            }
+
+            poolToShuffle.splice(12, 0, centerItem);
+            tasks = poolToShuffle;
+            
+            state = Array(25).fill(false);
+            stampMap = Array(25).fill(""); 
+
+            localStorage.setItem('nola_bingo_tasks', JSON.stringify(tasks));
+            localStorage.setItem('nola_bingo_state', JSON.stringify(state));
+            localStorage.setItem('nola_bingo_stamps', JSON.stringify(stampMap));
         }
-
-        poolToShuffle.splice(12, 0, centerItem);
-        const tasks = poolToShuffle; 
 
         const board = document.getElementById('board');
         const winMessage = document.getElementById('win-message');
         const blackoutModal = document.getElementById('blackout-modal');
         const btnPlayAgain = document.getElementById('btn-play-again');
         const btnShareWin = document.getElementById('btn-share-win');
-        
-        const state = Array(25).fill(false);
 
         // Preload Victory Audio Element
         const victoryMusic = new Audio('bigeasy.mp3');
@@ -424,6 +447,10 @@
 
             const rayImg = document.createElement('img');
             rayImg.classList.add('ray-stamp');
+            if (state[index] && stampMap[index]) {
+                rayImg.src = stampMap[index];
+                square.classList.add('checked');
+            }
             square.appendChild(rayImg);
 
             const textSpan = document.createElement('span');
@@ -437,40 +464,64 @@
                 
                 if (state[index]) {
                     const randomNum = Math.floor(Math.random() * 10) + 1;
-                    rayImg.src = `ray${randomNum}.png`;
+                    const raySrc = `ray${randomNum}.png`;
+                    rayImg.src = raySrc;
+                    stampMap[index] = raySrc;
                     square.classList.add('checked');
                 } else {
                     square.classList.remove('checked');
+                    stampMap[index] = "";
                 }
                 
-                // Track Blackout Win vs Standard Row/Column Win
-                if (state.every(squareChecked => squareChecked === true)) {
-                    blackoutModal.style.display = 'flex';
-                    victoryMusic.play().catch(err => {
-                        console.log("Audio autoplay prevented by browser policy.", err);
-                    });
-                } else if (checkBingo()) {
-                    winMessage.style.display = 'block';
-                } else {
-                    winMessage.style.display = 'none';
-                }
+                localStorage.setItem('nola_bingo_state', JSON.stringify(state));
+                localStorage.setItem('nola_bingo_stamps', JSON.stringify(stampMap));
+                
+                evaluateWinConditions();
             });
 
             board.appendChild(square);
         });
 
-        // Toggle strike-through completed state for Challenges
+        function evaluateWinConditions() {
+            if (state.every(squareChecked => squareChecked === true)) {
+                blackoutModal.style.display = 'flex';
+                victoryMusic.play().catch(err => {
+                    console.log("Audio autoplay prevented by browser policy.", err);
+                });
+            } else if (checkBingo()) {
+                winMessage.style.display = 'block';
+            } else {
+                winMessage.style.display = 'none';
+            }
+        }
+        evaluateWinConditions();
+
+        // Persistent Challenge List Progress Tracker
         const challengeItems = document.querySelectorAll('#challenges-ul li');
+        let completedChallenges = JSON.parse(localStorage.getItem('nola_challenges_state')) || {};
+
         challengeItems.forEach(item => {
+            const id = item.getAttribute('data-id');
+            
+            if (completedChallenges[id]) {
+                item.classList.add('completed');
+            }
+
             item.addEventListener('click', () => {
                 item.classList.toggle('completed');
+                completedChallenges[id] = item.classList.contains('completed');
+                localStorage.setItem('nola_challenges_state', JSON.stringify(completedChallenges));
             });
         });
 
-        // Play Again reloads page to reset states and clear layout 
+        // Play Again flushes active configurations
         btnPlayAgain.addEventListener('click', () => {
             victoryMusic.pause();
             victoryMusic.currentTime = 0;
+            localStorage.removeItem('nola_bingo_tasks');
+            localStorage.removeItem('nola_bingo_state');
+            localStorage.removeItem('nola_bingo_stamps');
+            localStorage.removeItem('nola_challenges_state');
             window.location.reload();
         });
 
