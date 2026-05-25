@@ -409,9 +409,9 @@
         let tasks = [];
         let state = [];
         let stampMap = [];
-        let hasPlayedBingoVideo = false; // Add this line here to track the video state
-        
-
+        // Read the flag from localStorage on page load, defaulting to false if it doesn't exist yet
+        let hasPlayedBingoVideo = JSON.parse(localStorage.getItem('has_played_bingo_video')) || false;
+      
         // --- Persistent Storage Logic ---
         const storedTasks = localStorage.getItem('nola_bingo_tasks');
         const storedState = localStorage.getItem('nola_bingo_state');
@@ -524,6 +524,7 @@
                 // If it's the very first BINGO of the session, trigger the video and flashing overlay
                 if (!hasPlayedBingoVideo) {
                     hasPlayedBingoVideo = true;
+                    localStorage.setItem('has_played_bingo_video', JSON.stringify(true)); // Save state to localStorage immediately
                     
                     // Display and play video
                     bingoVideo.style.display = 'block';
@@ -574,7 +575,8 @@
         btnPlayAgain.addEventListener('click', () => {
             victoryMusic.pause();
             victoryMusic.currentTime = 0;
-            hasPlayedBingoVideo = false; // Reset the video tracking flag
+            hasPlayedBingoVideo = false;
+            localStorage.removeItem('has_played_bingo_video'); // Clear the persistent video tracker flag
             localStorage.removeItem('nola_bingo_tasks');
             localStorage.removeItem('nola_bingo_state');
             localStorage.removeItem('nola_bingo_stamps');
