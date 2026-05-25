@@ -167,16 +167,33 @@
             opacity: 0.2;
         }
 
-        /* Win Notification (Standard Line Bingo) */
+        /* Win Notification (Overlays Video dynamically) */
         #win-message {
-            margin-top: 20px;
-            color: var(--nola-gold);
-            font-weight: bold;
-            font-size: 1.5rem;
+            position: fixed;
+            top: 30%; /* Positions it perfectly over the top half of the video */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999; /* Higher than the video so it sits on top */
+            color: #39FF14; /* Neon green to match your new theme preference */
+            font-weight: 900;
+            font-size: 2.5rem;
             text-transform: uppercase;
-            animation: blink 1s infinite alternate;
+            text-align: center;
+            white-space: nowrap;
             display: none;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 30px #39FF14;
+            animation: party-flash 0.4s infinite alternate;
+        }
+        
+        @keyframes party-flash {
+            from { 
+                opacity: 0.2; 
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05);
+            }
         }
 
         /* Challenges List Styling */
@@ -392,6 +409,8 @@
         let tasks = [];
         let state = [];
         let stampMap = [];
+        let hasPlayedBingoVideo = false; // Add this line here to track the video state
+        
 
         // --- Persistent Storage Logic ---
         const storedTasks = localStorage.getItem('nola_bingo_tasks');
@@ -487,37 +506,45 @@
         function evaluateWinConditions() {
             const bingoVideo = document.getElementById('bingo-video');
         
+            // 1. Handle Blackout Victory (Prioritized over everything)
             if (state.every(squareChecked => squareChecked === true)) {
-                // 1. Handle Blackout Victory
                 blackoutModal.style.display = 'flex';
-                // Pause the short video if it happens to be playing
+                winMessage.style.display = 'none';
                 bingoVideo.pause();
                 bingoVideo.style.display = 'none';
                 
                 victoryMusic.play().catch(err => {
                     console.log("Audio autoplay prevented by browser policy.", err);
                 });
-            } else if (checkBingo()) {
-                // 2. Handle Regular Line BINGO
-                winMessage.style.display = 'block';
-                
-                // Only trigger the video if it's not already visible/playing
-                if (bingoVideo.style.display === 'none') {
-                    bingoVideo.style.display = 'block';
-                    bingoVideo.currentTime = 0; // Reset to start
+                return; // Exit early
+            } 
+            
+            // 2. Handle Line BINGO
+            if (checkBingo()) {
+                // If it's the very first BINGO of the session, trigger the video and flashing overlay
+                if (!hasPlayedBingoVideo) {
+                    hasPlayedBingoVideo = true;
                     
+                    // Display and play video
+                    bingoVideo.style.display = 'block';
+                    bingoVideo.currentTime = 0;
                     bingoVideo.play().catch(err => {
-                        console.log("Video autoplay prevented by browser policy. Requires user interaction click first.", err);
+                        console.log("Video autoplay blocked.", err);
                     });
         
-                    // Automatically hide and stop the video after exactly 7 seconds
+                    // Display the flashing celebratory text overlay
+                    winMessage.style.display = 'block';
+        
+                    // Automatically clean up both the text and video after exactly 7 seconds
                     setTimeout(() => {
                         bingoVideo.pause();
                         bingoVideo.style.display = 'none';
-                    }, 7000); // 7000 milliseconds = 7 seconds
+                        winMessage.style.display = 'none';
+                    }, 7000);
                 }
             } else {
-                // 3. No Bingo active
+                // If they uncheck a square and no longer have any BINGOs, reset everything 
+                // except the tracking flag (so re-checking doesn't trigger the video again)
                 winMessage.style.display = 'none';
                 bingoVideo.pause();
                 bingoVideo.style.display = 'none';
@@ -547,6 +574,7 @@
         btnPlayAgain.addEventListener('click', () => {
             victoryMusic.pause();
             victoryMusic.currentTime = 0;
+            hasPlayedBingoVideo = false; // Reset the video tracking flag
             localStorage.removeItem('nola_bingo_tasks');
             localStorage.removeItem('nola_bingo_state');
             localStorage.removeItem('nola_bingo_stamps');
