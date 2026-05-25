@@ -156,11 +156,11 @@
             transform: scale(1);
         }
 
-        /* Checked State: Tint Background and Highlight with Thin Neon Purple Border */
+        /* Checked State: Tint Background and Highlight with Thin Neon Green Border */
         .bingo-square.checked {
             background-color: #1a1511;
-            border: 2px solid var(--neon-purple);
-            box-shadow: inset 0 0 8px rgba(157, 0, 255, 0.4);
+            border: 3px solid var(--nola-green); /* Changed from var(--neon-purple) to var(--nola-green) */
+            box-shadow: inset 0 0 8px rgba(0, 122, 51, 0.4); /* Adjusted inner glow to match green */
         }
         
         .bingo-square.checked .square-img {
