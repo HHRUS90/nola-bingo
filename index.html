@@ -330,6 +330,7 @@
     <div class="bingo-board" id="board"></div>
 
     <div id="win-message">🎉 RAY-BINGO!!! 🎉</div>
+    <video id="bingo-video" playsinline webkit-playsinline src="your-video.mp4" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9998; max-width: 90vw; max-height: 80vh; border: 3px solid var(--nola-gold); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.8);"></video>
 
     <div class="challenges-container">
         <h2>🔥 Weekend Challenges 🔥</h2>
@@ -483,15 +484,42 @@
         });
 
         function evaluateWinConditions() {
+            const bingoVideo = document.getElementById('bingo-video');
+        
             if (state.every(squareChecked => squareChecked === true)) {
+                // 1. Handle Blackout Victory
                 blackoutModal.style.display = 'flex';
+                // Pause the short video if it happens to be playing
+                bingoVideo.pause();
+                bingoVideo.style.display = 'none';
+                
                 victoryMusic.play().catch(err => {
                     console.log("Audio autoplay prevented by browser policy.", err);
                 });
             } else if (checkBingo()) {
+                // 2. Handle Regular Line BINGO
                 winMessage.style.display = 'block';
+                
+                // Only trigger the video if it's not already visible/playing
+                if (bingoVideo.style.display === 'none') {
+                    bingoVideo.style.display = 'block';
+                    bingoVideo.currentTime = 0; // Reset to start
+                    
+                    bingoVideo.play().catch(err => {
+                        console.log("Video autoplay prevented by browser policy. Requires user interaction click first.", err);
+                    });
+        
+                    // Automatically hide and stop the video after exactly 7 seconds
+                    setTimeout(() => {
+                        bingoVideo.pause();
+                        bingoVideo.style.display = 'none';
+                    }, 7000); // 7000 milliseconds = 7 seconds
+                }
             } else {
+                // 3. No Bingo active
                 winMessage.style.display = 'none';
+                bingoVideo.pause();
+                bingoVideo.style.display = 'none';
             }
         }
         evaluateWinConditions();
