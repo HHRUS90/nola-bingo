@@ -38,15 +38,26 @@
         }
 
         header {
-            text-align: center;
             margin-bottom: 20px;
             border: 3px double var(--nola-gold);
-            padding: 15px;
+            padding: 10px;
             background: linear-gradient(135deg, var(--nola-purple), #2a1442);
             border-radius: 8px;
             width: 100%;
             max-width: 500px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            
+            /* Layout to support side-by-side images and text */
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        /* Container to keep text centered dynamically */
+        .header-text-container {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 5px;
         }
 
         header h1 {
@@ -62,6 +73,20 @@
             color: #e0e0e0;
             margin-top: 5px;
             font-weight: 600;
+        }
+
+        /* Styling for Ray's header side-images */
+        .header-ray-face {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+
+        /* Mirrors the right image layout as requested */
+        .header-ray-face.mirrored {
+            transform: scaleX(-1);
         }
 
         /* 5x5 Bingo Grid */
@@ -340,8 +365,17 @@
 <body>
 
     <header>
-        <h1>NOLA Scavenger Hunt BINGO</h1>
-        <p>🎭 Ray's Stag Party 🎭</p>
+        <!-- Left Face Asset Placement -->
+        <img src="ray13.png" alt="Ray Left" class="header-ray-face">
+        
+        <!-- Center Text Grouping Container -->
+        <div class="header-text-container">
+            <h1>NOLA Scavenger Hunt BINGO</h1>
+            <p>🎭 Ray's Stag Party 🎭</p>
+        </div>
+
+        <!-- Right Face Asset Placement (Mirrored) -->
+        <img src="ray13.png" alt="Ray Right" class="header-ray-face mirrored">
     </header>
 
     <div class="bingo-board" id="board"></div>
