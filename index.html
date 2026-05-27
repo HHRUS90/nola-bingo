@@ -77,11 +77,14 @@
 
         /* Styling for Ray's header side-images */
         .header-ray-face {
-            width: 65px;
-            height: 65px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
             flex-shrink: 0;
             margin-bottom: 5px;
+            /* If the asset has a transparent background, this matches the header purple perfectly */
+            background-color: var(--nola-purple); 
+            border-radius: 50%; /* Optional: rounds it out nicely if it's a square asset */
         }
 
         /* Mirrors the right image layout as requested */
