@@ -395,6 +395,12 @@
             <li data-id="c6">Challenge 7: Stay out past 10pm every night</li>
         </ul>
     </div>
+    
+    </div> <button id="btn-replay-video" style="margin-top: 15px; padding: 10px 20px; background-color: var(--nola-purple); color: var(--nola-gold); border: 2px solid var(--nola-gold); border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s ease;">
+        🎥 Replay Bingo Video
+    </button>
+
+    <footer>Created by AJ Sundby 5/28/2026 ...</footer>
 
     <footer>Created by AJ Sundby 5/28/2026 <span class="love-ray">Love you Ray!</span></footer>
 
@@ -640,6 +646,30 @@
                     alert("Could not copy link automatically. Screenshot your screen to share the win!");
                 }
             }
+        });
+
+        // Replay Bingo Video on demand
+        const btnReplayVideo = document.getElementById('btn-replay-video');
+        btnReplayVideo.addEventListener('click', () => {
+            const bingoVideo = document.getElementById('bingo-video');
+            const winMessage = document.getElementById('win-message');
+
+            // Display and play the video from the beginning
+            bingoVideo.style.display = 'block';
+            bingoVideo.currentTime = 0;
+            bingoVideo.play().catch(err => {
+                console.log("Video replay blocked by browser policy.", err);
+            });
+
+            // Display the flashing celebratory text overlay
+            winMessage.style.display = 'block';
+
+            // Automatically clean up both the text and video after exactly 7 seconds
+            setTimeout(() => {
+                bingoVideo.pause();
+                bingoVideo.style.display = 'none';
+                winMessage.style.display = 'none';
+            }, 7000);
         });
 
         // Winning combinations logic
